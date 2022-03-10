@@ -6,6 +6,7 @@
 #include <utility>
 #include <string>
 #include "Header.h"
+#include <fstream>
 
 using namespace std;
 
@@ -23,14 +24,14 @@ Grammar::~Grammar() {
 	return;
 }
 
-void Grammar::loadGrammar(const std::istream &stream) {
+void Grammar::loadGrammar( std::istream &stream) {
 	// Вставляем код задачи 1.1
 	// 1. считываем грамматику и записываем ее в grammar
 	// 2. если считать не удалось, то выбрасываем исключение
 	
 	// для чтения одной строки файла используйте конструкцию getline((std::basic_istream<char, std::char_traits<char>> &)stream, line);
 	string line;
-	while (getline((std::basic_istream<char, std::char_traits<char>> &)stream, line)) {
+	while (getline(stream, line)) {
 		auto p = line.find(" -> ");
 		auto left = line.substr(0, p);
 		auto right = line.substr(p + 4);
@@ -55,9 +56,21 @@ void Grammar::loadGrammar(const std::istream &stream) {
 	calculateFOLLOW();
 }
 
+
 ostream & operator << (ostream & stream, const Grammar &g) {
 	// Вставляем код задачи 1.1
-
+	for (auto obj : g.grammar) {
+		// Выводим правила вывода текущего нетерминала
+		for (auto list : obj.second)
+		{
+			stream << obj.first << " -> ";
+			for (string symbl : list)
+			{
+				stream << symbl << " ";
+			}
+			stream << endl;
+		}
+	}
 	return stream;
 }
 
@@ -67,21 +80,20 @@ void Grammar::initFIRSTWithTerminalsAndEpsilon() {
 	for (auto i : grammar)
 	{
 	
-		notterminals.push_back(i.first);
+		notterminals.insert(i.first);
 		set<string> a;
 
-		for (auto i : grammar[i.first])
+		for (auto k : i.second)
 		{
-			for (auto j : i)
+			for (auto j : k)
 			{
 				if (j == "e")
 				{
 					a.insert("e");
-					goto label;
+					break;
 				}
 			}
 		}
-	label:
 		FIRSTForG[i.first] = a;
 	}
 
@@ -102,27 +114,12 @@ void Grammar::initFIRSTWithTerminalsAndEpsilon() {
 			//cout << endl;
 		}
 	}
-	//подгружаем нетерминалы
-	for (auto i : FIRSTForG)
-	{
-		bool test = true;
-		for (auto j : notterminals)
-		{
-			if (j == i.first)
-				test = false;
-		}
-		if (test)
-		{
-			terminals.push_back(i.first);
-		}
-	}
 }
 
 void Grammar::printFIRST(ostream &stream) {
 	// Вставляем код задачи 1.2
 	for (auto i : FIRSTForG)
 	{
-
 		if (!i.second.empty())
 		{
 			cout << i.first << " = ";
@@ -131,9 +128,6 @@ void Grammar::printFIRST(ostream &stream) {
 				cout << "[" << j << "] ";
 			}
 			cout << endl;
-		}
-		else{
-			cout << "[" << "e" << "] ";
 		}
 	}
 }
@@ -158,7 +152,7 @@ set<string> Grammar::FIRST(const vector<string>& str) {
 	set<string> result;
 
 	// Вставляем код задачи 1.3
-	if (str.size() == 1 && str[0] == "e")
+	if (str[0] == "e")
 	{
 		result.insert("e");
 		return result;

@@ -27,13 +27,14 @@ private:
 	void initFOLLOW();
 	void calculateFOLLOW();
 
-	vector <string> notterminals;
-	vector <string> terminals;
+	set <string> notterminals;
+	set <string> terminals;
 
 public:
 	Grammar();
 	~Grammar();
-	void loadGrammar(const std::istream& stream);
+	void loadGrammar(std::istream& stream);
+
 	void printFIRST(ostream& stream);
 	set<string> FIRST(const vector<string>&);
 	set<string> FIRST(string&);

@@ -27,4 +27,7 @@
       <Filter>Исходные файлы</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="grammar.txt" />
+  </ItemGroup>
 </Project>
